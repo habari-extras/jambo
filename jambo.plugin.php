@@ -35,7 +35,6 @@ class Jambo extends Plugin
 		if ( Plugins::id_from_file( $file ) == Plugins::id_from_file( __FILE__ ) ) {
 			foreach ( self::default_options() as $name => $value ) {
 				Options::set( self::OPTION_NAME . '__' . $name, $value );
-				Utils::debug($value);
 			}
 		}
 	}
