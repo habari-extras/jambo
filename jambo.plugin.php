@@ -32,16 +32,17 @@ class Jambo extends Plugin
 	
 	public function action_plugin_activation( $file )
 	{
-		if ( $file == $this->get_file() ) {
+		if ( Plugins::id_from_file( $file ) == Plugins::id_from_file( __FILE__ ) ) {
 			foreach ( self::default_options() as $name => $value ) {
-				Options::set( self::OPTION_NAME . ':' . $name, $value );
+				Options::set( self::OPTION_NAME . '__' . $name, $value );
+				Utils::debug($value);
 			}
 		}
 	}
 	
 	// helper function to return option values
 	public static function get( $name ) {
-		return Options::get( self::OPTION_NAME . ':' . $name );
+		return Options::get( self::OPTION_NAME . '__' . $name );
 	}
 	
 	/**
@@ -86,23 +87,24 @@ class Jambo extends Plugin
 					$ui = new FormUI( self::OPTION_NAME );
 					
 					// Add a text control for the address you want the email sent to
-					$send_to= $ui->add( 'text', 'send_to', 'Where To Send Email: ' );
+					$send_to= $ui->append( 'text', 'send_to', 'option:jambo__send_to', _t( 'Where To Send Email: ' ) );
 					$send_to->add_validator( 'validate_required' );
 					
 					// Add a text control for the prefix to the subject field
-					$subject_prefix= $ui->add( 'text', 'subject_prefix', 'Subject Prefix: ' );
+					$subject_prefix= $ui->append( 'text', 'subject_prefix', 'option:jambo__subject_prefix', _t( 'Subject Prefix: ' ) );
 					$subject_prefix->add_validator( 'validate_required' );
 					
-					$show_form_on_success= $ui->add( 'checkbox', 'show_form_on_success', 'Show Contact Form After Sending?: ' );
+					$show_form_on_success= $ui->append( 'checkbox', 'show_form_on_success', 'option:jambo__show_form_on_success', _t( 'Show Contact Form After Sending?: ' ) );
 					
 					// Add a text control for the prefix to the success message
-					$success_msg= $ui->add( 'textarea', 'success_msg', 'Success Message: ' );
+					$success_msg= $ui->append( 'textarea', 'success_msg', 'option:jambo__success_msg', _t( 'Success Message: ' ) );
 					$success_msg->add_validator( 'validate_required' );
 					
 					// Add a text control for the prefix to the subject field
-					$error_msg= $ui->add( 'textarea', 'error_msg', 'Error Message: ' );
+					$error_msg= $ui->append( 'textarea', 'error_msg', 'option:jambo__error_msg', _t( 'Error Message: ') );
 					$error_msg->add_validator( 'validate_required' );
 					
+					$ui->append( 'submit', 'save', 'Save' );
 					$ui->out();
 					break;
 			}
