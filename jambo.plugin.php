@@ -14,7 +14,7 @@ require_once 'jambohandler.php';
 
 class Jambo extends Plugin
 {
-	const VERSION= '1.2';
+	const VERSION= '1.3-alpha';
 	const OPTION_NAME= 'jambo';
 	
 	private $theme;
