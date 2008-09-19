@@ -11,7 +11,7 @@ class JamboHandler extends ActionHandler
 	
 	public function act_send()
 	{
-		$email= array();
+		$email = array();
 		$email['sent']=           false;
 		$email['valid']=          true;
 		$email['send_to']=        Jambo::get( 'send_to' );
@@ -27,7 +27,7 @@ class JamboHandler extends ActionHandler
 			"From: {$email['name']} <{$email['email']}>\r\n" .
 			"Content-Type: text/plain; charset=\"utf-8\"\r\n";
 		
-		$email= Plugins::filter( 'jambo_email', $email, $this->handler_vars );
+		$email = Plugins::filter( 'jambo_email', $email, $this->handler_vars );
 		
 		if ( $email['valid'] ) {
 			$email['sent']= mail( $email['send_to'], $email['subject_prefix'] . $email['subject'], $email['message'], $email['headers'] );
@@ -42,18 +42,18 @@ class JamboHandler extends ActionHandler
 	// set a cookie like in comments.
 	private function remember_contactor( $email )
 	{
-		$cookie= 'comment_' . Options::get('GUID');
+		$cookie = 'comment_' . Options::get('GUID');
 		if ( ( ! User::identify() ) 
 			&& ( ! isset( $_COOKIE[$cookie] ) ) 
 			&& ( ! empty( $email['name'] ) || ! empty( $email['email'] ) ) )
 		{
-			$cookie_content= $email['name'] . '#' . $email['email'] . '#' . '';
-			$site_url= Site::get_path('base');
+			$cookie_content = $email['name'] . '#' . $email['email'] . '#' . '';
+			$site_url = Site::get_path('base');
 			if ( empty( $site_url ) ) {
-				$site_url= rtrim( $_SERVER['SCRIPT_NAME'], 'index.php' );
+				$site_url = rtrim( $_SERVER['SCRIPT_NAME'], 'index.php' );
 			}
 			else {
-				$site_url= '/' . $site_url . '/';
+				$site_url = '/' . $site_url . '/';
 			}
 			setcookie( $cookie, $cookie_content, time() + 31536000, $site_url );
 		}

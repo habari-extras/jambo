@@ -14,8 +14,8 @@ require_once 'jambohandler.php';
 
 class Jambo extends Plugin
 {
-	const VERSION= '1.3-alpha';
-	const OPTION_NAME= 'jambo';
+	const VERSION = '1.3-alpha';
+	const OPTION_NAME = 'jambo';
 	
 	private $theme;
 	
@@ -86,21 +86,21 @@ class Jambo extends Plugin
 					$ui = new FormUI( self::OPTION_NAME );
 					
 					// Add a text control for the address you want the email sent to
-					$send_to= $ui->append( 'text', 'send_to', 'option:jambo__send_to', _t( 'Where To Send Email: ' ) );
+					$send_to = $ui->append( 'text', 'send_to', 'option:jambo__send_to', _t( 'Where To Send Email: ' ) );
 					$send_to->add_validator( 'validate_required' );
 					
 					// Add a text control for the prefix to the subject field
-					$subject_prefix= $ui->append( 'text', 'subject_prefix', 'option:jambo__subject_prefix', _t( 'Subject Prefix: ' ) );
+					$subject_prefix = $ui->append( 'text', 'subject_prefix', 'option:jambo__subject_prefix', _t( 'Subject Prefix: ' ) );
 					$subject_prefix->add_validator( 'validate_required' );
 					
-					$show_form_on_success= $ui->append( 'checkbox', 'show_form_on_success', 'option:jambo__show_form_on_success', _t( 'Show Contact Form After Sending?: ' ) );
+					$show_form_on_success = $ui->append( 'checkbox', 'show_form_on_success', 'option:jambo__show_form_on_success', _t( 'Show Contact Form After Sending?: ' ) );
 					
 					// Add a text control for the prefix to the success message
-					$success_msg= $ui->append( 'textarea', 'success_msg', 'option:jambo__success_msg', _t( 'Success Message: ' ) );
+					$success_msg = $ui->append( 'textarea', 'success_msg', 'option:jambo__success_msg', _t( 'Success Message: ' ) );
 					$success_msg->add_validator( 'validate_required' );
 					
 					// Add a text control for the prefix to the subject field
-					$error_msg= $ui->append( 'textarea', 'error_msg', 'option:jambo__error_msg', _t( 'Error Message: ') );
+					$error_msg = $ui->append( 'textarea', 'error_msg', 'option:jambo__error_msg', _t( 'Error Message: ') );
 					$error_msg->add_validator( 'validate_required' );
 					
 					$ui->append( 'submit', 'save', 'Save' );
@@ -143,7 +143,7 @@ class Jambo extends Plugin
 		if ( !in_array( 'jambo.form', $templates ) ) {
 			switch ( strtolower($class) ) {
 				case 'rawphpengine':
-					$templates= array_merge( $templates, array('jambo.form') );
+					$templates = array_merge( $templates, array('jambo.form') );
 					break;
 			}
 		}
@@ -156,10 +156,10 @@ class Jambo extends Plugin
 			if ( ! file_exists( $template_path ) ) {
 				switch ( strtolower($class) ) {
 					case 'rawphpengine':
-						$template_path= dirname( $this->get_file() ) . '/templates/jambo.form.php';
+						$template_path = dirname( $this->get_file() ) . '/templates/jambo.form.php';
 						break;
 					case 'smartyengine':
-						$template_path= dirname( $this->get_file() ) . '/templates/jambo.form.tpl';
+						$template_path = dirname( $this->get_file() ) . '/templates/jambo.form.tpl';
 						break;
 				}
 			}
@@ -171,12 +171,12 @@ class Jambo extends Plugin
 	// saves us from creating a new theme object and using more resources.
 	public function action_add_template_vars( &$theme, $handler_vars )
 	{
-		$this->theme= $theme;
+		$this->theme = $theme;
 	}
 	
 	public function filter_post_content_out( $content )
 	{
-		$content= str_ireplace( array('<!-- jambo -->', '<!-- contactform -->'), $this->get_form(), $content );
+		$content = str_ireplace( array('<!-- jambo -->', '<!-- contactform -->'), $this->get_form(), $content );
 		return $content;
 	}
 	
@@ -222,10 +222,10 @@ class Jambo extends Plugin
 	private function get_code( $ip = '' )
 	{
 		if( $ip == '' ) {
-			$ip= ip2long($_SERVER['REMOTE_ADDR']);
+			$ip = ip2long($_SERVER['REMOTE_ADDR']);
 		}
-		$code= substr(md5( Options::get('GUID') . 'more salt' . $ip ), 0, 10);
-		$code= Plugins::filter('jambo_code', $code, $ip);
+		$code = substr(md5( Options::get('GUID') . 'more salt' . $ip ), 0, 10);
+		$code = Plugins::filter('jambo_code', $code, $ip);
 		return $code;
 	}
 	
@@ -240,8 +240,8 @@ class Jambo extends Plugin
 	}
 	
 	private function get_OSA( $time ) {
-		$osa= 'osa_' . substr( md5( $time . Options::get( 'GUID' ) . self::VERSION ), 0, 10 );
-		$osa= Plugins::filter('jambo_OSA', $osa, $time);
+		$osa = 'osa_' . substr( md5( $time . Options::get( 'GUID' ) . self::VERSION ), 0, 10 );
+		$osa = Plugins::filter('jambo_OSA', $osa, $time);
 		return $osa;
 	}
 	
@@ -256,12 +256,12 @@ class Jambo extends Plugin
 	
 	private function OSA( $vars ) {
 		if ( array_key_exists( 'osa', $vars ) && array_key_exists( 'osa_time', $vars ) ) {
-			$osa= $vars['osa'];
-			$time= $vars['osa_time'];
+			$osa = $vars['osa'];
+			$time = $vars['osa_time'];
 		}
 		else {
-			$time= time();
-			$osa= $this->get_OSA( $time );
+			$time = time();
+			$osa = $this->get_OSA( $time );
 		}
 		return "<input type=\"hidden\" name=\"osa\" value=\"$osa\" />\n<input type=\"hidden\" name=\"osa_time\" value=\"$time\" />\n";
 	}
@@ -269,10 +269,10 @@ class Jambo extends Plugin
 	/**
 	 * 
 	 */
-	public static function input( $type, $name, $label, $vars= array() )
+	public static function input( $type, $name, $label, $vars = array() )
 	{
-		$style= ( array_key_exists( 'errors', $vars ) && array_key_exists( $name, $vars['errors'] ) ) ? 'class="input-warning"' : '';
-		$value= array_key_exists( $name, $vars ) ? $vars[$name] : '';
+		$style = ( array_key_exists( 'errors', $vars ) && array_key_exists( $name, $vars['errors'] ) ) ? 'class="input-warning"' : '';
+		$value = array_key_exists( $name, $vars ) ? $vars[$name] : '';
 		
 		switch ( $type ) {
 			default:
@@ -288,33 +288,33 @@ class Jambo extends Plugin
 	private function get_form()
 	{
 		if ( $this->theme instanceof Theme && $this->theme->template_exists( 'jambo.form' ) ) {
-			$vars= array_merge( User::commenter(), Session::get_set( 'jambo_email' ) );
+			$vars = array_merge( User::commenter(), Session::get_set( 'jambo_email' ) );
 			
-			$this->theme->jambo= new stdClass;
-			$jambo= $this->theme->jambo;
+			$this->theme->jambo = new stdClass;
+			$jambo = $this->theme->jambo;
 			
-			$jambo->form_action= URL::get('jambo');
-			$jambo->success_msg= self::get( 'success_msg' );
-			$jambo->error_msg= self::get('error_msg');
-			$jambo->show_form= true;
-			$jambo->success= false;
-			$jambo->error= false;
+			$jambo->form_action = URL::get('jambo');
+			$jambo->success_msg = self::get( 'success_msg' );
+			$jambo->error_msg = self::get('error_msg');
+			$jambo->show_form = true;
+			$jambo->success = false;
+			$jambo->error = false;
 			
 			if ( array_key_exists( 'valid', $vars ) && $vars['valid'] ) {
-				$jambo->success= true;
-				$jambo->show_form= self::get( 'show_form_on_success' );
+				$jambo->success = true;
+				$jambo->show_form = self::get( 'show_form_on_success' );
 			}
 			
 			if ( array_key_exists( 'errors', $vars ) ) {
-				$jambo->error= true;
-				$jambo->errors= $vars['errors'];
+				$jambo->error = true;
+				$jambo->errors = $vars['errors'];
 			}
 			
-			$jambo->name= $this->input( 'text', 'name', 'Your Name: (Required)', $vars );
-			$jambo->email= $this->input( 'text', 'email', 'Your Email: (Required)', $vars );
-			$jambo->subject= $this->input( 'text', 'subject', 'Subject: ', $vars );
-			$jambo->message= $this->input( 'textarea', 'message', 'Your Remarks: (Required)', $vars );
-			$jambo->osa= $this->OSA( $vars );
+			$jambo->name = $this->input( 'text', 'name', 'Your Name: (Required)', $vars );
+			$jambo->email = $this->input( 'text', 'email', 'Your Email: (Required)', $vars );
+			$jambo->subject = $this->input( 'text', 'subject', 'Subject: ', $vars );
+			$jambo->message = $this->input( 'textarea', 'message', 'Your Remarks: (Required)', $vars );
+			$jambo->osa = $this->OSA( $vars );
 			
 			return $this->theme->fetch( 'jambo.form' );
 		}
