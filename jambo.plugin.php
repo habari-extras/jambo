@@ -14,7 +14,7 @@ require_once 'jambohandler.php';
 
 class Jambo extends Plugin
 {
-	const VERSION = '1.3-alpha';
+	const VERSION = '1.4-alpha';
 	const OPTION_NAME = 'jambo';
 	
 	private $theme;
@@ -145,6 +145,9 @@ class Jambo extends Plugin
 				case 'rawphpengine':
 					$templates = array_merge( $templates, array('jambo.form') );
 					break;
+				case 'hiengine':
+					$templates = array_merge( $templates, array('jambo.form') );
+					break;
 			}
 		}
 		return $templates;
@@ -160,6 +163,9 @@ class Jambo extends Plugin
 						break;
 					case 'smartyengine':
 						$template_path = dirname( $this->get_file() ) . '/templates/jambo.form.tpl';
+						break;
+					case 'hiengine':
+						$template_path = dirname( $this->get_file() ) . '/templates/jambo.form.hi';
 						break;
 				}
 			}

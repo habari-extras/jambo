@@ -1,0 +1,67 @@
+<?php
+
+/**
+ * Defalut form template for the Jambo contact form plugin for Habari
+ *
+ * @package jambo
+ */
+
+?>
+
+<div id="jambo">
+	<form method="post" action="{hi:jambo.form_action}">
+	
+	{hi:?jambo.success}
+		<p class="success">{hi:jambo.success_msg}</p>
+	{/hi:?}
+	
+	{hi:?jambo.error}
+		<div class="warning">
+			{hi:jambo.error_msg}
+			<ul>
+			<?php $errors = $jambo->errors; ?>
+			{hi:errors}
+				<li>{hi:errors_1}</li>
+			{/hi:errors}
+			</ul>
+		</div>
+	{/hi:?}
+	
+	{hi:?jambo.show_form}
+	<p>
+		<label>
+			Your Name: (required)<br />
+			{hi:jambo.name}
+		<label>
+	</p>
+	
+	<p>
+		<label>
+			Your Email: (required)<br />
+			{hi:jambo.email}
+		<label>
+	</p>
+	
+	<p>
+		<label>
+			Subject: (optional)<br />
+			{hi:jambo.subject}
+		<label>
+	</p>
+	
+	<p>
+		<label>
+			Your Remarks: (required)<br />
+			{hi:jambo.message}
+		<label>
+	</p>
+	
+	<p>
+		{hi:jambo.osa}
+		<input type="submit" value="Send It!" name="submit" class="button" />
+	</p>
+	
+	{/hi:?}
+	
+	</form>
+</div>
