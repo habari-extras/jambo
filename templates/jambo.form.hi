@@ -19,10 +19,9 @@
 		<div class="warning">
 			{hi:jambo.error_msg}
 			<ul>
-			<?php $errors = $jambo->errors; ?>
-			{hi:errors}
-				<li>{hi:errors_1}</li>
-			{/hi:errors}
+			<?php foreach ( $jambo->errors as $jambo_error ) { ?>
+				<li><?php echo $jambo_error; ?></li>
+			<?php } ?>
 			</ul>
 		</div>
 	{/hi:?}

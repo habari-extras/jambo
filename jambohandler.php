@@ -16,10 +16,10 @@ class JamboHandler extends ActionHandler
 		$email['valid']=          true;
 		$email['send_to']=        Jambo::get( 'send_to' );
 		$email['subject_prefix']= Jambo::get( 'subject_prefix' );
-		$email['name']=           Inputfilter::filter( $this->handler_vars['name'] );
-		$email['email']=          Inputfilter::filter( $this->handler_vars['email'] );
-		$email['subject']=        Inputfilter::filter( $this->handler_vars['subject'] );
-		$email['message']=        Inputfilter::filter( $this->handler_vars['message'] );+
+		$email['name']=           $this->handler_vars['name'];
+		$email['email']=          $this->handler_vars['email'];
+		$email['subject']=        $this->handler_vars['subject'];
+		$email['message']=        $this->handler_vars['message'];+
 		$email['osa']=            $this->handler_vars['osa'];
 		$email['osa_time']=       $this->handler_vars['osa_time'];
 		
@@ -43,7 +43,7 @@ class JamboHandler extends ActionHandler
 	private function remember_contactor( $email )
 	{
 		$cookie = 'comment_' . Options::get('GUID');
-		if ( ( ! User::identify() ) 
+		if ( ( ! User::identify()->loggedin ) 
 			&& ( ! isset( $_COOKIE[$cookie] ) ) 
 			&& ( ! empty( $email['name'] ) || ! empty( $email['email'] ) ) )
 		{
