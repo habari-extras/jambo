@@ -216,7 +216,27 @@ class Jambo extends Plugin
 			$email['valid']= false;
 			$email['errors']['message']= _t( '<em>Your Remarks</em> is a <strong>required field</strong>.' );
 		}
-		
+
+		if( $email['valid'] !== false ) {
+			$comment = new Comment( array(
+				'name' => $email['name'],
+				'email' => $email['email'],
+				'content' => $email['message'],
+				'ip' => sprintf("%u", ip2long( $_SERVER['REMOTE_ADDR'] ) ),
+				'post_id' => ( isset( $post ) ? $post->id : 0 ),
+			) );
+
+			$handlervars['ccode'] = $handlervars['jcode'];
+			$_SESSION['comments_allowed'][] = $handlervars['ccode'];
+			Plugins::act('comment_insert_before', $comment);
+
+			if( count($comment->info->spamcheck ) ) {
+				ob_end_clean();
+				header('HTTP/1.1 403 Forbidden');
+				die(_t('<h1>The selected action is forbidden.</h1><p>Your attempted contact appears to be spam. If it wasn\'t, return to the previous page and try again.</p>'));
+			}
+		}
+
 		return $email;
 	}
 	
@@ -234,23 +254,23 @@ class Jambo extends Plugin
 		$code = Plugins::filter('jambo_code', $code, $ip);
 		return $code;
 	}
-	
+
 	/**
 	 * Verify a 10-digit hex code that identifies the user submitting the feedback
 	 * @param The IP address of the commenter
 	 * @return True if the code is valid, false if not
-	 **/	 	 	 	 
+	 **/
 	private function verify_code( $suspect_code, $ip = '' )
 	{
 		return ( $suspect_code == $this->get_code( $ip ) );
 	}
-	
+
 	private function get_OSA( $time ) {
 		$osa = 'osa_' . substr( md5( $time . Options::get( 'GUID' ) . self::VERSION ), 0, 10 );
 		$osa = Plugins::filter('jambo_OSA', $osa, $time);
 		return $osa;
 	}
-	
+
 	private function verify_OSA( $osa, $time ) {
 		if ( $osa == $this->get_OSA( $time ) ) {
 			if ( ( time() > ($time + 5) ) && ( time() < ($time + 5*60) ) ) {
@@ -259,7 +279,7 @@ class Jambo extends Plugin
 		}
 		return false;
 	}
-	
+
 	private function OSA( $vars ) {
 		if ( array_key_exists( 'osa', $vars ) && array_key_exists( 'osa_time', $vars ) ) {
 			$osa = $vars['osa'];
@@ -271,7 +291,7 @@ class Jambo extends Plugin
 		}
 		return "<input type=\"hidden\" name=\"osa\" value=\"$osa\" />\n<input type=\"hidden\" name=\"osa_time\" value=\"$time\" />\n";
 	}
-	
+
 	/**
 	 * 
 	 */
@@ -290,7 +310,7 @@ class Jambo extends Plugin
 				break;
 		}
 	}
-	
+
 	private function get_form()
 	{
 		if ( $this->theme instanceof Theme && $this->theme->template_exists( 'jambo.form' ) ) {
@@ -305,7 +325,7 @@ class Jambo extends Plugin
 			$jambo->show_form = true;
 			$jambo->success = false;
 			$jambo->error = false;
-			
+
 			if ( array_key_exists( 'valid', $vars ) && $vars['valid'] ) {
 				$jambo->success = true;
 				$jambo->show_form = self::get( 'show_form_on_success' );
@@ -315,7 +335,7 @@ class Jambo extends Plugin
 				$jambo->error = true;
 				$jambo->errors = $vars['errors'];
 			}
-			
+
 			$jambo->name = $this->input( 'text', 'name', 'Your Name: (Required)', $vars );
 			$jambo->email = $this->input( 'text', 'email', 'Your Email: (Required)', $vars );
 			$jambo->subject = $this->input( 'text', 'subject', 'Subject: ', $vars );
