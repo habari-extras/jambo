@@ -216,7 +216,6 @@ class Jambo extends Plugin
 			$email['valid']= false;
 			$email['errors']['message']= _t( '<em>Your Remarks</em> is a <strong>required field</strong>.' );
 		}
-
 		if( $email['valid'] !== false ) {
 			$comment = new Comment( array(
 				'name' => $email['name'],
@@ -230,7 +229,7 @@ class Jambo extends Plugin
 			$_SESSION['comments_allowed'][] = $handlervars['ccode'];
 			Plugins::act('comment_insert_before', $comment);
 
-			if( count($comment->info->spamcheck ) ) {
+			if( Comment::STATUS_SPAM == $comment->status ) {
 				ob_end_clean();
 				header('HTTP/1.1 403 Forbidden');
 				die(_t('<h1>The selected action is forbidden.</h1><p>Your attempted contact appears to be spam. If it wasn\'t, return to the previous page and try again.</p>'));
