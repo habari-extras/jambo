@@ -1,0 +1,9 @@
+<plugin>
+	<url>http://drunkenmonkey.org/projects/jambo</url>
+	<name>Jambo</name>
+	<license>Apache License 2.0</license>
+	<author>Drunken Monkey Labs</author>
+	<authorurl>http://drunkenmonkey.org/projects/jambo</authorurl>
+	<description>Adds a contact form to any page or post.</description>
+</plugin>
+
