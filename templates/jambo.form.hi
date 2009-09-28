@@ -31,28 +31,28 @@
 		<label>
 			Your Name: (required)<br />
 			{hi:jambo.name}
-		<label>
+		</label>
 	</p>
 	
 	<p>
 		<label>
 			Your Email: (required)<br />
 			{hi:jambo.email}
-		<label>
+		</label>
 	</p>
 	
 	<p>
 		<label>
 			Subject: (optional)<br />
 			{hi:jambo.subject}
-		<label>
+		</label>
 	</p>
 	
 	<p>
 		<label>
 			Your Remarks: (required)<br />
 			{hi:jambo.message}
-		<label>
+		</label>
 	</p>
 	
 	<p>

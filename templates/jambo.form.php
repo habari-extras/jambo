@@ -31,28 +31,28 @@
 		<label>
 			Your Name: (required)<br />
 			<?php echo $jambo->name; ?>
-		<label>
+		</label>
 	</p>
 	
 	<p>
 		<label>
 			Your Email: (required)<br />
 			<?php echo $jambo->email; ?>
-		<label>
+		</label>
 	</p>
 	
 	<p>
 		<label>
 			Subject: (optional)<br />
 			<?php echo $jambo->subject; ?>
-		<label>
+		</label>
 	</p>
 	
 	<p>
 		<label>
 			Your Remarks: (required)<br />
 			<?php echo $jambo->message; ?>
-		<label>
+		</label>
 	</p>
 	
 	<p>
