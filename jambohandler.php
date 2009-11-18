@@ -19,7 +19,7 @@ class JamboHandler extends ActionHandler
 		$email['name']=           $this->handler_vars['name'];
 		$email['email']=          $this->handler_vars['email'];
 		$email['subject']=        $this->handler_vars['subject'];
-		$email['message']=        $this->handler_vars['message'];+
+		$email['message']=        $this->handler_vars['message'];
 		$email['osa']=            $this->handler_vars['osa'];
 		$email['osa_time']=       $this->handler_vars['osa_time'];
 		
