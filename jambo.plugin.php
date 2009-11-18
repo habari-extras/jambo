@@ -19,6 +19,11 @@ class Jambo extends Plugin
 	
 	private $theme;
 	
+	public function help()
+	{
+		return _t('Add a contact form by inserting either <code>&lt;!-- jambo --&gt;</code> or <code>&lt;!-- contactform --&gt;</code> into an entry or page.');
+	}
+	
 	private static function default_options()
 	{
 		return array(
@@ -157,7 +162,7 @@ class Jambo extends Plugin
 	
 	// here we store the current theme object for use later
 	// saves us from creating a new theme object and using more resources.
-	public function action_add_template_vars( &$theme, $handler_vars )
+	public function action_add_template_vars( $theme, $handler_vars )
 	{
 		$this->theme = $theme;
 	}
