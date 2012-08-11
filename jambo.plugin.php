@@ -12,8 +12,52 @@
  * @todo use Habari's spam filtering.
  */
 
-class JamboFormUI extends Plugin
+class Jambo extends Plugin
 {	
+	/**
+	 * Build the configuration settings
+	 */
+	public function configure()
+	{
+		$ui = new FormUI( 'jambo_config' );
+
+		// Add a text control for the address you want the email sent to
+		$send_to = $ui->append( 'text', 'send_to', 'option:jambo__send_to', _t( 'Where To Send Email: ' ) );
+		$send_to->add_validator( 'validate_required' );
+
+		// Add a text control for the prefix to the subject field
+		$subject_prefix = $ui->append( 'text', 'subject', 'option:jambo__subject', _t( 'Subject: ' ) );
+		$subject_prefix->add_validator( 'validate_required' );
+		
+		// Add a text control for the prefix to the success message
+		$success_msg = $ui->append( 'textarea', 'success_msg', 'option:jambo__success_msg', _t( 'Success Message: ' ) );
+		
+		$ui->append( 'submit', 'save', 'Save' );
+		return $ui;
+	}
+	
+	/**
+	 * Set the priority of inserting the contact form
+	 */
+	public function set_priorities()
+	{
+		return array(
+			'filter_post_content_out' => 11
+			);
+	}
+	
+	/**
+	 * Insert the form into post content in place of '<!-- jambo -->' or '<!-- contactform -->')
+	 */
+	public function filter_post_content_out( $content )
+	{
+		$content = str_ireplace( array('<!-- jambo -->', '<!-- contactform -->'), $this->get_jambo_form()->get(), $content );
+		return $content;
+	}
+	
+	/**
+	 * Get the jambo form
+	 */
 	public function get_jambo_form( ) {
 		// borrow default values from the comment forms
 		$commenter_name = '';
@@ -83,7 +127,10 @@ class JamboFormUI extends Plugin
 		// Return the form object
 		return $form;
 	}
-
+	
+	/**
+	 * Process the jambo form and send the email
+	 */
 	function process_jambo( $form )
 	{
 		// get the values and the stored options.
@@ -111,39 +158,10 @@ class JamboFormUI extends Plugin
 
 		return '<p class="jambo-confirmation">' .$email ['success_msg']  .'</p>';
 	}
-
-	public function set_priorities()
-	{
-		return array(
-			'filter_post_content_out' => 11
-			);
-	}
 	
-	public function configure()
-	{
-		$ui = new FormUI( 'jambo_config' );
-
-		// Add a text control for the address you want the email sent to
-		$send_to = $ui->append( 'text', 'send_to', 'option:jambo__send_to', _t( 'Where To Send Email: ' ) );
-		$send_to->add_validator( 'validate_required' );
-
-		// Add a text control for the prefix to the subject field
-		$subject_prefix = $ui->append( 'text', 'subject', 'option:jambo__subject', _t( 'Subject: ' ) );
-		$subject_prefix->add_validator( 'validate_required' );
-		
-		// Add a text control for the prefix to the success message
-		$success_msg = $ui->append( 'textarea', 'success_msg', 'option:jambo__success_msg', _t( 'Success Message: ' ) );
-		
-		$ui->append( 'submit', 'save', 'Save' );
-		return $ui;
-	}
-	
-	public function filter_post_content_out( $content )
-	{
-		$content = str_ireplace( array('<!-- jambo -->', '<!-- contactform -->'), $this->get_jambo_form()->get(), $content );
-		return $content;
-	}
-	
+	/**
+	 * Check the email using spam filter, piggybacking on Comment functionality
+	 */
 	public function filter_jambo_email( $email, $handlervars )
 	{
 		if ( ! $this->verify_OSA( $handlervars['osa'], $handlervars['osa_time'] ) ) {
@@ -175,12 +193,18 @@ class JamboFormUI extends Plugin
 		return $email;
 	}
 	
+	/**
+	 * Get an OSA (is this necessary?)
+	 */
 	private function get_OSA( $time ) {
 		$osa = 'osa_' . substr( md5( $time . Options::get( 'GUID' ) . self::VERSION ), 0, 10 );
 		$osa = Plugins::filter('jambo_OSA', $osa, $time);
 		return $osa;
 	}
-
+	
+	/**
+	 * Verify an OSA (see above)
+	 */
 	private function verify_OSA( $osa, $time ) {
 		if ( $osa == $this->get_OSA( $time ) ) {
 			if ( ( time() > ($time + 5) ) && ( time() < ($time + 5*60) ) ) {
@@ -190,6 +214,9 @@ class JamboFormUI extends Plugin
 		return false;
 	}
 
+	/**
+	 * Return OSA input (see above)
+	 */
 	private function OSA( $vars ) {
 		if ( array_key_exists( 'osa', $vars ) && array_key_exists( 'osa_time', $vars ) ) {
 			$osa = $vars['osa'];
