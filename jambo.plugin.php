@@ -66,7 +66,7 @@ class Jambo extends Plugin
 	/**
 	 * Find out if we should request a subject 
 	 **/
-	private function ask_subject()
+	private static function ask_subject()
 	{
 		$ask = true;
 		
@@ -149,6 +149,20 @@ class Jambo extends Plugin
 		$form->jambo_email->caption = _t( 'Email' );
 		$form->jambo_email->value = $commenter_email;
 
+		// Create the Subject field, if requested
+		if( self::ask_subject() )
+		{
+			$form->append(
+				'text',
+				'jambo_subject',
+				'null:null',
+				_t( 'Subject' ),
+				'formcontrol_text'
+			)
+			->id = 'jambo_subject';
+			$form->jambo_subject->tabindex =32;
+		}
+
 		// Create the Message field
 		$form->append(
 			'text',
@@ -166,6 +180,9 @@ class Jambo extends Plugin
 
 		// Set up form processing
 		$form->on_success( array($this, 'process_jambo') );
+		
+		// Plugins::act( 'jambo_build_form', $form, $this ); // Allow modification of form
+		
 		// Return the form object
 		return $form;
 	}
@@ -190,13 +207,20 @@ class Jambo extends Plugin
 */		
 		// Develop the email subject
 		$email['subject'] = Options::get( 'jambo__subject' );
+		if( self::ask_subject() )
+		{
+			$email['subject'] = sprintf( $email['subject'], $form->jambo_subject->value );
+		}
 		
 		// Utils::mail expects an array
 		$email['headers'] = array( 'MIME-Version' => '1.0',
 			'From' => "{$email['name']} <{$email['email']}>",
 			'Content-Type' => 'text/plain; charset="utf-8"' );
 
-// 		$email = Plugins::filter( 'jambo_email', $email /* something */ );
+		$email = Plugins::filter( 'jambo_email', $email, $form ); // Allow another plugin to modify the sent email
+
+		// Utils::debug( $email );
+		// exit;
 		
 		$email['sent'] = Utils::mail( $email['send_to'], $email['subject'], $email['message'], $email['headers'] );
 
@@ -206,36 +230,38 @@ class Jambo extends Plugin
 	/**
 	 * Check the email using spam filter, piggybacking on Comment functionality
 	 */
-	public function filter_jambo_email( $email, $handlervars )
-	{
-		if ( ! $this->verify_OSA( $handlervars['osa'], $handlervars['osa_time'] ) ) {
-			ob_end_clean();
-			header('HTTP/1.1 403 Forbidden');
-			die(_t('<h1>The selected action is forbidden.</h1><p>You are submitting the form too fast and look like a spam bot.</p>'));
-		}
-		
-		if( $email['valid'] !== false ) {
-			$comment = new Comment( array(
-				'name' => $email['name'],
-				'email' => $email['email'],
-				'content' => $email['message'],
-				'ip' => sprintf("%u", ip2long( $_SERVER['REMOTE_ADDR'] ) ),
-				'post_id' => ( isset( $post ) ? $post->id : 0 ),
-			) );
-
-			$handlervars['ccode'] = $handlervars['jcode'];
-			$_SESSION['comments_allowed'][] = $handlervars['ccode'];
-			Plugins::act('comment_insert_before', $comment);
-
-			if( Comment::STATUS_SPAM == $comment->status ) {
-				ob_end_clean();
-				header('HTTP/1.1 403 Forbidden');
-				die(_t('<h1>The selected action is forbidden.</h1><p>Your attempted contact appears to be spam. If it wasn\'t, return to the previous page and try again.</p>'));
-			}
-		}
-
-		return $email;
-	}
+	// public function filter_jambo_email( $email, $form )
+	// {
+	// 	// figure out OSA stuff?
+	// 	
+	// 	// if ( ! $this->verify_OSA( $handlervars['osa'], $handlervars['osa_time'] ) ) {
+	// 	// 	ob_end_clean();
+	// 	// 	header('HTTP/1.1 403 Forbidden');
+	// 	// 	die(_t('<h1>The selected action is forbidden.</h1><p>You are submitting the form too fast and look like a spam bot.</p>'));
+	// 	// }
+	// 	
+	// 	if( $email['valid'] !== false ) {
+	// 		$comment = new Comment( array(
+	// 			'name' => $email['name'],
+	// 			'email' => $email['email'],
+	// 			'content' => $email['message'],
+	// 			'ip' => sprintf("%u", ip2long( $_SERVER['REMOTE_ADDR'] ) ),
+	// 			'post_id' => ( isset( $post ) ? $post->id : 0 ),
+	// 		) );
+	// 
+	// 		$handlervars['ccode'] = $handlervars['jcode'];
+	// 		$_SESSION['comments_allowed'][] = $handlervars['ccode'];
+	// 		Plugins::act('comment_insert_before', $comment);
+	// 
+	// 		if( Comment::STATUS_SPAM == $comment->status ) {
+	// 			ob_end_clean();
+	// 			header('HTTP/1.1 403 Forbidden');
+	// 			die(_t('<h1>The selected action is forbidden.</h1><p>Your attempted contact appears to be spam. If it wasn\'t, return to the previous page and try again.</p>'));
+	// 		}
+	// 	}
+	// 
+	// 	return $email;
+	// }
 	
 	/**
 	 * Get an OSA (is this necessary?)
