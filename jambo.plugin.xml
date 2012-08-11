@@ -10,14 +10,18 @@
 	
 	<help>
 		<value><![CDATA[
-			<p>Add a contact form by inserting <code>[contact/]</code> into an entry or page. The configuration settings can be overriden with attributes:</p>
+			<p>Add a contact form by inserting <code>[contact_form/]</code> into an entry or page. The configuration settings can be overridden with attributes:</p>
 			<ul>
 				<li><code>send_to</code> - where to send the email</li>
 				<li><code>subject</code> - the subject of the email; <code>%s</code> will be replaced with a subject which the user will be asked to provide</li>
 				<li><code>success_message</code> - the message to show when the email is sent</li>
 			</ul>
-			<p>For example <code>[contact send_to="<em>quotes@mastermade.us</em>" subject="<em>Quote Request</em>"/]</code> would send an email to <em>quotes@mastermade.us</em> with the subject <em>Quote Request</em>.</p>
+			<p>For example <code>[contact_form send_to="<em>quotes@mastermade.us</em>" subject="<em>Quote Request</em>"/]</code> would send an email to <em>quotes@mastermade.us</em> with the subject <em>Quote Request</em>.</p>
 		]]></value>
 	</help>
+	
+	<provides>
+		<feature url="http://wiki.habariproject.org/en/feature/contact_form">contact_form</feature>
+	</provides>
 	
 </pluggable>

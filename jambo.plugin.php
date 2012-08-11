@@ -86,7 +86,7 @@ class Jambo extends Plugin
 	/**
 	 * Implement the shortcode to show the form
 	 */
-	function filter_shortcode_contact($content, $code, $attrs, $context)
+	function filter_shortcode_contact_form($content, $code, $attrs, $context)
 	{	
 		return $this->get_jambo_form( $attrs, $context )->get();
 	}
