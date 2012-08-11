@@ -181,7 +181,7 @@ class Jambo extends Plugin
 		// Set up form processing
 		$form->on_success( array($this, 'process_jambo') );
 		
-		// Plugins::act( 'jambo_build_form', $form, $this ); // Allow modification of form
+		Plugins::act( 'jambo_build_form', $form, $this ); // Allow modification of form
 		
 		// Return the form object
 		return $form;
