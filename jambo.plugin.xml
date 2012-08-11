@@ -3,8 +3,8 @@
 	<name>Jambo</name>
 	<license url="http://www.apache.org/licenses/LICENSE-2.0.html">Apache Software License 2.0</license>
 	<author url="http://drunkenmonkey.org/projects/jambo">Drunken Monkey Labs</author>
-	<version>1.4.1</version>
+	<version>2.0</version>
 	<url>http://drunkenmonkey.org/projects/jambo</url>
 	<description><![CDATA[Adds a contact form to any page or post.]]></description>
-	<copyright>2009</copyright>
-</pluggable>  
+	<copyright>2011</copyright>
+</pluggable>
