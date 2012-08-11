@@ -14,6 +14,30 @@
 
 class Jambo extends Plugin
 {	
+	private static function default_options()
+	{
+		$options = array(
+			'send_to' => $_SERVER['SERVER_ADMIN'],
+			'subject' => _t( '[CONTACT FORM] %s' ),
+			'show_form_on_success' => 1,
+			'success_msg' => _t( 'Thank you for your feedback. I\'ll get back to you as soon as possible.' ),
+			'error_msg' => _t( 'The following errors occurred with the information you submitted. Please correct them and re-submit the form.' )
+			);
+		return Plugins::filter( 'jambo__defaultoptions', $options );
+	}
+
+	/**
+	 * On activation, check and set default options
+	 */
+	public function action_plugin_activation( $file )
+		{
+			if ( Plugins::id_from_file( $file ) == Plugins::id_from_file( __FILE__ ) ) {
+				foreach ( self::default_options() as $name => $value ) {
+					Options::set( 'jambo__' . $name, $value );
+				}
+			}
+		}
+	
 	/**
 	 * Build the configuration settings
 	 */
@@ -25,15 +49,33 @@ class Jambo extends Plugin
 		$send_to = $ui->append( 'text', 'send_to', 'option:jambo__send_to', _t( 'Where To Send Email: ' ) );
 		$send_to->add_validator( 'validate_required' );
 
-		// Add a text control for the prefix to the subject field
-		$subject_prefix = $ui->append( 'text', 'subject', 'option:jambo__subject', _t( 'Subject: ' ) );
-		$subject_prefix->add_validator( 'validate_required' );
+		// Add a text control for email subject
+		$subject = $ui->append( 'text', 'subject', 'option:jambo__subject', _t( 'Subject: ' ) );
+		$subject->add_validator( 'validate_required' );
+
+		// Add an explanation for the subject field. Shouldn't FormUI have an easier way to do this?
+		$ui->append( 'static', 'subject_explanation', '<p>' . _t( 'An %s in the subject will be replaced with a subject provided by the user. If omitted, no subject will be requested.' ) . '</p>' );
 		
 		// Add a text control for the prefix to the success message
 		$success_msg = $ui->append( 'textarea', 'success_msg', 'option:jambo__success_msg', _t( 'Success Message: ' ) );
 		
 		$ui->append( 'submit', 'save', 'Save' );
 		return $ui;
+	}
+	
+	/**
+	 * Find out if we should request a subject 
+	 **/
+	private function ask_subject()
+	{
+		$ask = true;
+		
+		if( strpos( Options::get( 'jambo__subject' ), '%s' ) === false )
+		{
+			$ask = false;
+		}
+		
+		return Plugins::filter( 'jambo__ask_subject', $ask );
 	}
 	
 	/**
@@ -140,13 +182,15 @@ class Jambo extends Plugin
 		$email['send_to'] =	Options::get( 'jambo__send_to' );
 		$email['name'] = $form->jambo_name->value;
 		$email['email'] = $form->jambo_email->value;
-		$email['subject'] = Options::get( 'jambo__subject' );
 		$email['message'] = $form->jambo_message->value;
 		$email['success_msg'] = Options::get ( 'jambo__success_msg','Thank you contacting me. I\'ll get back to you as soon as possible.' );
 /*		// interesting stuff, this OSA business. If it's not covered by FormUI, maybe it should be.
 		$email['osa'] =            $this->handler_vars['osa'];
 		$email['osa_time'] =       $this->handler_vars['osa_time'];
 */		
+		// Develop the email subject
+		$email['subject'] = Options::get( 'jambo__subject' );
+		
 		// Utils::mail expects an array
 		$email['headers'] = array( 'MIME-Version' => '1.0',
 			'From' => "{$email['name']} <{$email['email']}>",
