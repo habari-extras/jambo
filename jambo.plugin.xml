@@ -3,14 +3,20 @@
 	<name>Jambo</name>
 	<license url="http://www.apache.org/licenses/LICENSE-2.0.html">Apache Software License 2.0</license>
 	<author url="http://drunkenmonkey.org/projects/jambo">Drunken Monkey Labs</author>
-	<version>2.0</version>
+	<version>2.1</version>
 	<url>http://drunkenmonkey.org/projects/jambo</url>
 	<description><![CDATA[Adds a contact form to any page or post.]]></description>
 	<copyright>2011</copyright>
 	
 	<help>
 		<value><![CDATA[
-			Add a contact form by inserting either <code>&lt;!-- jambo --&gt;</code> or <code>&lt;!-- contactform --&gt;</code> into an entry or page.
+			<p>Add a contact form by inserting <code>[contact/]</code> into an entry or page. The configuration settings can be overriden with attributes:</p>
+			<ul>
+				<li><code>send_to</code> - where to send the email</li>
+				<li><code>subject</code> - the subject of the email; <code>%s</code> will be replaced with a subject which the user will be asked to provide</li>
+				<li><code>success_message</code> - the message to show when the email is sent</li>
+			</ul>
+			<p>For example <code>[contact send_to="<em>quotes@mastermade.us</em>" subject="<em>Quote Request</em>"/]</code> would send an email to <em>quotes@mastermade.us</em> with the subject <em>Quote Request</em>.</p>
 		]]></value>
 	</help>
 	

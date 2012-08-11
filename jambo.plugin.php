@@ -66,41 +66,35 @@ class Jambo extends Plugin
 	/**
 	 * Find out if we should request a subject 
 	 **/
-	private static function ask_subject()
+	private static function ask_subject( $subject = null )
 	{
 		$ask = true;
 		
-		if( strpos( Options::get( 'jambo__subject' ), '%s' ) === false )
+		if( $subject == null )
+		{
+			$subject = Options::get( 'jambo__subject' );
+		}
+		
+		if( strpos( $subject, '%s' ) === false )
 		{
 			$ask = false;
 		}
 		
 		return Plugins::filter( 'jambo__ask_subject', $ask );
 	}
-	
+		
 	/**
-	 * Set the priority of inserting the contact form
+	 * Implement the shortcode to show the form
 	 */
-	public function set_priorities()
-	{
-		return array(
-			'filter_post_content_out' => 11
-			);
-	}
-	
-	/**
-	 * Insert the form into post content in place of '<!-- jambo -->' or '<!-- contactform -->')
-	 */
-	public function filter_post_content_out( $content )
-	{
-		$content = str_ireplace( array('<!-- jambo -->', '<!-- contactform -->'), $this->get_jambo_form()->get(), $content );
-		return $content;
+	function filter_shortcode_contact($content, $code, $attrs, $context)
+	{	
+		return $this->get_jambo_form( $attrs, $context )->get();
 	}
 	
 	/**
 	 * Get the jambo form
 	 */
-	public function get_jambo_form( ) {
+	public function get_jambo_form( $attrs, $context = null ) {
 		// borrow default values from the comment forms
 		$commenter_name = '';
 		$commenter_email = '';
@@ -120,6 +114,14 @@ class Jambo extends Plugin
 			$commenter_url = Site::get_url( 'habari' );
 		}
 
+		// Process settings from shortcode and database
+		$settings = array(
+			'subject' => Options::get( 'jambo__subject' ),
+			'send_to' => Options::get( 'jambo__send_to' ),
+			'success_message' => Options::get( 'jambo__success_msg', 'Thank you contacting me. I\'ll get back to you as soon as possible.' )
+		);
+		$settings = array_merge( $settings, $attrs );
+		
 		// Now start the form.
 		$form = new FormUI( 'jambo' );
 // 		$form->set_option( 'form_action', URL::get( 'submit_feedback', array( 'id' => $this->id ) ) );
@@ -150,7 +152,7 @@ class Jambo extends Plugin
 		$form->jambo_email->value = $commenter_email;
 
 		// Create the Subject field, if requested
-		if( self::ask_subject() )
+		if( self::ask_subject( $settings['subject'] ) )
 		{
 			$form->append(
 				'text',
@@ -179,7 +181,7 @@ class Jambo extends Plugin
 		$form->jambo_submit->tabindex = 5;
 
 		// Set up form processing
-		$form->on_success( array($this, 'process_jambo') );
+		$form->on_success( array($this, 'process_jambo'), $settings );
 		
 		Plugins::act( 'jambo_build_form', $form, $this ); // Allow modification of form
 		
@@ -190,24 +192,24 @@ class Jambo extends Plugin
 	/**
 	 * Process the jambo form and send the email
 	 */
-	function process_jambo( $form )
-	{
+	function process_jambo( $form, $settings )
+	{		
+		
 		// get the values and the stored options.
-
 		$email = array();
-		$email['sent'] =		false;
-		$email['send_to'] =	Options::get( 'jambo__send_to' );
+		$email['sent'] = false;
 		$email['name'] = $form->jambo_name->value;
+		$email['send_to'] =	$settings['send_to'];
 		$email['email'] = $form->jambo_email->value;
 		$email['message'] = $form->jambo_message->value;
-		$email['success_msg'] = Options::get ( 'jambo__success_msg','Thank you contacting me. I\'ll get back to you as soon as possible.' );
+		$email['success_message'] = $settings['success_message'];
 /*		// interesting stuff, this OSA business. If it's not covered by FormUI, maybe it should be.
 		$email['osa'] =            $this->handler_vars['osa'];
 		$email['osa_time'] =       $this->handler_vars['osa_time'];
 */		
 		// Develop the email subject
-		$email['subject'] = Options::get( 'jambo__subject' );
-		if( self::ask_subject() )
+		$email['subject'] = $settings['subject'];
+		if( self::ask_subject( $email['subject'] ) )
 		{
 			$email['subject'] = sprintf( $email['subject'], $form->jambo_subject->value );
 		}
@@ -219,12 +221,9 @@ class Jambo extends Plugin
 
 		$email = Plugins::filter( 'jambo_email', $email, $form ); // Allow another plugin to modify the sent email
 
-		// Utils::debug( $email );
-		// exit;
-		
 		$email['sent'] = Utils::mail( $email['send_to'], $email['subject'], $email['message'], $email['headers'] );
 
-		return '<p class="jambo-confirmation">' .$email ['success_msg']  .'</p>';
+		return '<p class="jambo-confirmation">' . $email['success_message']  .'</p>';
 	}
 	
 	/**
